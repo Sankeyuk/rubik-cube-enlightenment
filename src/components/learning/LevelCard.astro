@@ -1,0 +1,140 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { animalProfiles, levelAnimals } from "../../data/animalSkin";
+import ProgressRing from "./ProgressRing.astro";
+import Button from "../ui/Button.astro";
+import Card from "../ui/Card.astro";
+import { sitePath } from "../../utils/paths";
+
+interface Props {
+  level: CollectionEntry<"levels">;
+  stageLabel: string;
+  variant?: "compact" | "numbered";
+}
+
+const { level, stageLabel, variant = "compact" } = Astro.props;
+const animalSkin = levelAnimals[level.data.slug as keyof typeof levelAnimals];
+const primaryAnimal = animalSkin ? animalProfiles[animalSkin.primary as keyof typeof animalProfiles] : undefined;
+const secondaryAnimals =
+  animalSkin?.secondary?.map((id) => animalProfiles[id as keyof typeof animalProfiles]).filter(Boolean) ?? [];
+---
+
+<Card as="li">
+  {variant === "numbered" && <div class="level-number" aria-hidden="true">{level.data.order}</div>}
+  <div class="level-copy">
+    <div class="level-card-header">
+      <div class="level-title">
+        <h3>{level.data.title}</h3>
+        <p>{stageLabel}</p>
+      </div>
+      {primaryAnimal && (
+        <div class="level-animals" aria-label={`本关动物：${primaryAnimal.name}`}>
+          <img class="primary-animal" src={sitePath(primaryAnimal.avatar)} alt={primaryAnimal.alt} loading="lazy" />
+          {secondaryAnimals.length > 0 && (
+            <div class="secondary-animals" aria-label="辅助动物">
+              {secondaryAnimals.map((animal) => (
+                <img src={sitePath(animal.avatar)} alt={animal.alt} loading="lazy" />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+      <ProgressRing
+        completedUnits={level.data.progress.completedUnits}
+        totalUnits={level.data.progress.totalUnits}
+        label={level.data.title}
+      />
+    </div>
+    <p>{level.data.goal}</p>
+    {animalSkin && <p class="animal-tip">{animalSkin.hint}</p>}
+    <Button href={`/levels/${level.data.slug}`} variant={variant === "numbered" ? "primary" : "secondary"}>
+      进入这一关
+    </Button>
+  </div>
+</Card>
+
+<style>
+  .level-number {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: rgba(74, 144, 226, 0.1);
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .level-copy,
+  .level-card-header,
+  .level-title {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .level-card-header {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: start;
+  }
+
+  .level-title p {
+    font-weight: 700;
+  }
+
+  .level-copy > p {
+    max-width: 34rem;
+  }
+
+  .level-animals {
+    position: relative;
+    width: 58px;
+    min-height: 58px;
+  }
+
+  .primary-animal {
+    display: block;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border: 1px solid rgba(39, 39, 42, 0.08);
+    border-radius: var(--radius-full);
+    background: rgba(255, 247, 224, 0.8);
+  }
+
+  .secondary-animals {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    gap: 2px;
+  }
+
+  .secondary-animals img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    border: 1px solid rgba(39, 39, 42, 0.08);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+  }
+
+  .animal-tip {
+    padding: var(--space-sm) var(--space-md);
+    border-left: 4px solid rgba(219, 151, 46, 0.58);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 247, 224, 0.64);
+    font-size: var(--font-size-small);
+    font-weight: 700;
+  }
+
+  @media (max-width: 420px) {
+    .level-card-header {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .level-card-header :global(.progress-ring) {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,186 @@
+---
+import { getCollection } from "astro:content";
+import { stages } from "../../data/site";
+import { villageAnimals } from "../../data/animalSkin";
+import LevelMap from "../../components/learning/LevelMap.astro";
+import PageShell from "../../components/layout/PageShell.astro";
+import Badge from "../../components/ui/Badge.astro";
+import Button from "../../components/ui/Button.astro";
+import Card from "../../components/ui/Card.astro";
+import { routeSeo } from "../../data/seo";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sitePath } from "../../utils/paths";
+
+const levels = (await getCollection("levels")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<BaseLayout {...routeSeo["/levels"]} analyticsEvent="levels_index_view" analyticsProps={{ path: "/levels" }}>
+  <PageShell>
+    <section class="levels-banner" aria-label="关卡页 banner">
+      <img
+        src={sitePath("/images/banners/rubik-levels-banner.jpg")}
+        alt="木质桌面上的魔方"
+      />
+      <div class="banner-copy" aria-label="Banner 预留文字位置">
+        <p>跟着 8 关地图，一次只帮一个颜色家回到位置。</p>
+      </div>
+    </section>
+
+    <section class="level-map" aria-labelledby="first-face-heading">
+      <div class="section-heading">
+        <Badge tone="blue">路线图</Badge>
+        <h2 id="first-face-heading">8 关地图</h2>
+      </div>
+      <Card as="section">
+        <div class="intro-entry">
+          <div class="intro-number" aria-hidden="true">入</div>
+          <div>
+            <h3>入门介绍</h3>
+            <p>先认识魔方的面、块和基本手法，再进入第一关。</p>
+          </div>
+          <Button href="/levels/intro" variant="secondary">进入介绍页</Button>
+        </div>
+      </Card>
+      <section class="village-strip" aria-label="方块村动物入口">
+        <div>
+          <h3>方块村居民会出现在每一关旁边</h3>
+          <p>动物提示只保留一句，真正要做的目标仍然看关卡卡片。</p>
+        </div>
+        <div class="strip-animals">
+          {villageAnimals.map((animal) => <img src={sitePath(animal.avatar)} alt={animal.alt} loading="lazy" />)}
+        </div>
+        <Button href="/picturebook" variant="secondary">先看绘本</Button>
+      </section>
+      <LevelMap levels={levels} stages={stages} numbered />
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .section-heading,
+  .level-map,
+  .intro-entry,
+  .village-strip {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .levels-banner {
+    position: relative;
+    min-height: 220px;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface-muted);
+  }
+
+  .levels-banner img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+    aspect-ratio: 16 / 6;
+    object-fit: cover;
+    object-position: 38% center;
+  }
+
+  .levels-banner::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 54%, rgba(255, 255, 255, 0.68));
+    pointer-events: none;
+  }
+
+  .banner-copy {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    display: grid;
+    align-items: end;
+    min-height: 72px;
+    padding: var(--space-lg);
+    color: var(--color-text);
+    font-weight: 700;
+  }
+
+  .banner-copy p {
+    margin: 0;
+  }
+
+  .intro-entry {
+    align-items: center;
+  }
+
+  .intro-number {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: rgba(91, 185, 128, 0.12);
+    color: var(--color-accent);
+    font-weight: 800;
+  }
+
+  .intro-entry h3,
+  .intro-entry p,
+  .village-strip h3,
+  .village-strip p {
+    margin: 0;
+  }
+
+  .village-strip {
+    align-items: center;
+    padding: var(--space-md);
+    border: 1px solid rgba(219, 151, 46, 0.22);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(135deg, rgba(255, 247, 224, 0.7), rgba(255, 255, 255, 0.88)),
+      var(--color-surface);
+  }
+
+  .strip-animals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .strip-animals img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border: 1px solid rgba(39, 39, 42, 0.08);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+  }
+
+  @media (min-width: 720px) {
+    .levels-banner {
+      min-height: 300px;
+    }
+
+    .levels-banner img {
+      min-height: 300px;
+      aspect-ratio: 16 / 5;
+    }
+
+    .banner-copy {
+      min-height: 88px;
+      padding: var(--space-xl) var(--space-2xl);
+    }
+
+    .intro-entry {
+      grid-template-columns: auto minmax(0, 1fr) max-content;
+    }
+
+    .village-strip {
+      grid-template-columns: minmax(0, 1fr) auto max-content;
+    }
+  }
+</style>

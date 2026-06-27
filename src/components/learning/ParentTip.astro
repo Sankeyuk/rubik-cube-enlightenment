@@ -1,0 +1,36 @@
+---
+interface Props {
+  tips: string[];
+}
+
+const { tips } = Astro.props;
+---
+
+<aside class="parent-tip" aria-labelledby="parent-tip-title">
+  <strong id="parent-tip-title">家长提示</strong>
+  <ul>
+    {tips.map((tip) => <li>{tip}</li>)}
+  </ul>
+</aside>
+
+<style>
+  .parent-tip {
+    display: grid;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    border: 1px solid rgba(74, 144, 226, 0.24);
+    border-radius: var(--radius-lg);
+    background: rgba(74, 144, 226, 0.08);
+  }
+
+  ul {
+    display: grid;
+    gap: var(--space-sm);
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  li {
+    color: var(--color-muted-text);
+  }
+</style>

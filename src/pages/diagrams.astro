@@ -1,0 +1,126 @@
+---
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Callout from "../components/ui/Callout.astro";
+import Card from "../components/ui/Card.astro";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const specs = [
+  {
+    label: "教程步骤图",
+    ratio: "4:3",
+    size: "1200x900",
+    use: "放在关卡详情页，解释起始状态、关键步骤和完成结果。",
+  },
+  {
+    label: "LEGO 式示意图",
+    ratio: "1:1 或 4:3",
+    size: "1400x1400 / 1600x1200",
+    use: "强调位置关系和操作顺序，清楚优先，不追求装饰。",
+  },
+  {
+    label: "故事引用图",
+    ratio: "4:3",
+    size: "1200x900",
+    use: "在绘本故事页引用，帮助孩子把故事和关卡阶段连接起来。",
+  },
+  {
+    label: "打印材料图",
+    ratio: "3:2 或 4:3",
+    size: "1200x800 / 1200x900",
+    use: "为后续关卡卡和材料包预留，首版不做正式产品化。",
+  },
+];
+---
+
+<BaseLayout {...routeSeo["/diagrams"]}>
+  <PageShell>
+    <section class="page-intro" aria-labelledby="diagrams-title">
+      <Badge tone="blue">示意图材料位</Badge>
+      <h1 id="diagrams-title">先定义网站要接住哪些清晰 PNG</h1>
+      <p>示意图可以由魔方编辑器原理版辅助导出，目标是像 LEGO 说明书一样清楚。第一阶段编辑器不和网站工程合拢，只作为人工生产图片物料的辅助工具。</p>
+      <div class="actions">
+        <Button href="/levels/fake-cross">查看关卡图位</Button>
+        <Button href="/interfaces" variant="secondary">查看接口边界</Button>
+      </div>
+    </section>
+
+    <section class="spec-grid" aria-labelledby="spec-title">
+      <div class="section-heading">
+        <Badge tone="green">图片规格</Badge>
+        <h2 id="spec-title">按页面用途生产，而不是先做散图</h2>
+      </div>
+      <div class="cards-grid">
+        {
+          specs.map((spec) => (
+            <Card>
+              <h3>{spec.label}</h3>
+              <dl class="spec-meta">
+                <dt>比例</dt>
+                <dd>{spec.ratio}</dd>
+                <dt>尺寸</dt>
+                <dd>{spec.size}</dd>
+              </dl>
+              <p>{spec.use}</p>
+            </Card>
+          ))
+        }
+      </div>
+    </section>
+
+    <Callout tone="warning">
+      <strong>当前边界</strong>
+      <p>第一阶段不做自动同步、不做 diagram 数据源、不强制命名系统。真实图量变多后再统一素材规范。</p>
+    </Callout>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .page-intro,
+  .spec-grid,
+  .section-heading,
+  .cards-grid,
+  .actions {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .page-intro {
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .spec-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-xs) var(--space-sm);
+    margin: 0;
+  }
+
+  .spec-meta dt {
+    font-weight: 800;
+  }
+
+  .spec-meta dd {
+    margin: 0;
+    color: var(--color-muted-text);
+  }
+
+  @media (min-width: 720px) {
+    .page-intro {
+      padding: var(--space-2xl);
+    }
+
+    .actions {
+      grid-template-columns: max-content max-content;
+    }
+
+    .cards-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

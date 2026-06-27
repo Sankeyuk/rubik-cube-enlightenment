@@ -1,0 +1,218 @@
+---
+import { getCollection } from "astro:content";
+import { stages } from "../../data/site";
+import { animalProfiles, levelAnimals } from "../../data/animalSkin";
+import AnimalHint from "../../components/learning/AnimalHint.astro";
+import CasePatterns from "../../components/learning/CasePatterns.astro";
+import FormulaBlock from "../../components/learning/FormulaBlock.astro";
+import LessonBlocks from "../../components/learning/LessonBlocks.astro";
+import ParentTip from "../../components/learning/ParentTip.astro";
+import PassCriteria from "../../components/learning/PassCriteria.astro";
+import StepList from "../../components/learning/StepList.astro";
+import PageShell from "../../components/layout/PageShell.astro";
+import Badge from "../../components/ui/Badge.astro";
+import Button from "../../components/ui/Button.astro";
+import Card from "../../components/ui/Card.astro";
+import { getLevelSeo } from "../../data/seo";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const levels = await getCollection("levels");
+  return levels.map((level) => ({
+    params: { slug: level.data.slug },
+    props: { level },
+  }));
+}
+
+const { level } = Astro.props;
+const hasLessonBlocks = Boolean(level.data.lessonBlocks && level.data.lessonBlocks.length > 0);
+const lessonNextAction = level.data.lessonBlocks?.find((block) => block.button && block.buttonHref);
+const nextLevelSlug = lessonNextAction?.buttonHref?.split("/").filter(Boolean).at(-1) ?? "levels";
+const detailAnimalSlugs = new Set(["fake-cross", "first-layer-corners"]);
+const animalSkin = detailAnimalSlugs.has(level.data.slug)
+  ? levelAnimals[level.data.slug as keyof typeof levelAnimals]
+  : undefined;
+const primaryAnimal = animalSkin ? animalProfiles[animalSkin.primary as keyof typeof animalProfiles] : undefined;
+const seo = getLevelSeo(level.data.slug, {
+  title: `${level.data.title} · 玩转魔方，有手就行。`,
+  description: level.data.goal,
+});
+---
+
+<BaseLayout
+  {...seo}
+  analyticsEvent="level_detail_view"
+  analyticsProps={{
+    level_slug: level.data.slug,
+    level_order: level.data.order,
+    stage: level.data.stage,
+    path: `/levels/${level.data.slug}`,
+  }}
+>
+  <PageShell tone="quiet">
+    <section class:list={["level-hero", hasLessonBlocks && "level-summary"]} aria-labelledby="level-title">
+      <div class="level-kicker">
+        <Badge tone="blue">{stages[level.data.stage]}</Badge>
+      </div>
+      <h1 id="level-title">{level.data.title}</h1>
+      <p>{level.data.goal}</p>
+      {hasLessonBlocks && (
+        <p class="level-formula">
+          <strong>核心动作：</strong>
+          <span>{level.data.formula}</span>
+        </p>
+      )}
+      <div class="level-actions">
+        <Button href="/levels" variant="secondary">返回关卡地图</Button>
+      </div>
+    </section>
+
+    {animalSkin && primaryAnimal && (
+      <AnimalHint animal={primaryAnimal} hint={animalSkin.hint} levelSlug={level.data.slug} />
+    )}
+
+    {hasLessonBlocks ? (
+      <LessonBlocks blocks={level.data.lessonBlocks} />
+    ) : (
+      <>
+        <Card as="section">
+          <Badge tone="green">观察</Badge>
+          <h2>先看方格人在哪里</h2>
+          <ul class="content-list">
+            {level.data.observation.map((item) => <li>{item}</li>)}
+          </ul>
+        </Card>
+
+      </>
+    )}
+
+    {!hasLessonBlocks && (
+      <>
+        <Card as="section">
+          <Badge tone="blue">动物皮肤</Badge>
+          <h2>{level.data.animalSkin ?? "动物皮肤待定"}</h2>
+          <p class="skin-note">
+            {level.data.themeColor ?? stages[level.data.stage]} 阶段的视觉主题位。这里先显示内容草稿中的皮肤名称，后续可替换为真实绘本角色图。
+          </p>
+        </Card>
+
+        <FormulaBlock formula={level.data.formula} />
+
+        <Card as="section">
+          <StepList title="跟着做" items={level.data.steps} />
+        </Card>
+
+        {level.data.casePatterns && level.data.casePatterns.length > 0 && (
+          <Card as="section">
+            <CasePatterns patterns={level.data.casePatterns} />
+          </Card>
+        )}
+      </>
+    )}
+
+    {!hasLessonBlocks && (
+      <>
+        <Card as="section">
+          <PassCriteria items={level.data.passCriteria} />
+        </Card>
+
+        <ParentTip tips={level.data.parentTips} />
+
+        {level.data.sourceNote && (
+          <Card as="section">
+            <Badge tone="blue">参考路线</Badge>
+            <p class="source-note">{level.data.sourceNote}</p>
+            {level.data.sourceUrl && <a class="source-link" href={level.data.sourceUrl}>查看参考路线</a>}
+          </Card>
+        )}
+      </>
+    )}
+
+    {lessonNextAction && (
+      <section class="page-next-action" aria-label="下一关">
+        <Button
+          href={lessonNextAction.buttonHref ?? "/levels"}
+          variant="primary"
+          analyticsEvent="level_next_click"
+          analyticsProps={{
+            from_level_slug: level.data.slug,
+            to_level_slug: nextLevelSlug,
+            source_path: `/levels/${level.data.slug}`,
+          }}
+        >
+          {lessonNextAction.button ?? "进入下一关"}
+        </Button>
+      </section>
+    )}
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .level-hero,
+  .level-kicker,
+  .level-actions {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .level-hero {
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .level-kicker {
+    grid-template-columns: max-content;
+  }
+
+  .content-list {
+    display: grid;
+    gap: var(--space-sm);
+    padding-left: 1.2rem;
+  }
+
+  .content-list li {
+    color: var(--color-muted-text);
+  }
+
+  .skin-note {
+    max-width: 62ch;
+  }
+
+  .source-note,
+  .source-link,
+  .level-formula {
+    color: var(--color-muted-text);
+  }
+
+  .level-formula {
+    margin: 0;
+  }
+
+  .level-formula strong {
+    color: var(--color-text);
+  }
+
+  .source-link {
+    display: inline-block;
+    margin-top: var(--space-sm);
+    font-weight: 700;
+  }
+
+  .page-next-action {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-lg) 0 var(--space-md);
+  }
+
+  @media (min-width: 720px) {
+    .level-hero {
+      padding: var(--space-2xl);
+    }
+
+    .level-summary {
+      padding-block: var(--space-xl);
+    }
+  }
+</style>

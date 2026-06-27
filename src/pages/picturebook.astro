@@ -1,0 +1,109 @@
+---
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import { picturebookPages } from "../data/animalSkin";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { sitePath } from "../utils/paths";
+---
+
+<BaseLayout {...routeSeo["/picturebook"]} analyticsEvent="picturebook_view" analyticsProps={{ path: "/picturebook" }}>
+  <PageShell tone="quiet">
+    <section class="picturebook-intro" aria-labelledby="picturebook-title">
+      <Badge tone="yellow">魔方绘本</Badge>
+      <h1 id="picturebook-title">方块村被转乱的一天</h1>
+      <p>先用 10 页竖屏绘本认识“颜色街区”和“帮动物回家”，再回到关卡地图一步一步练。</p>
+      <div class="intro-actions">
+        <Button href="/levels/fake-cross">进入第 1 关</Button>
+        <Button href="/levels" variant="secondary">查看 8 关地图</Button>
+      </div>
+    </section>
+
+    <section class="reader" aria-label="方块村绘本连续阅读">
+      {
+        picturebookPages.map((page) => (
+          <figure class="book-page" id={`page-${page.page}`}>
+            <img src={sitePath(page.src)} alt={page.alt} loading={page.page <= 2 ? "eager" : "lazy"} />
+            <figcaption>第 {page.page} 页</figcaption>
+          </figure>
+        ))
+      }
+    </section>
+
+    <section class="picturebook-next" aria-labelledby="picturebook-next-title">
+      <h2 id="picturebook-next-title">看完绘本，回到真正的练习</h2>
+      <p>教程仍然按 8 个关卡推进。第 1 关先帮白色家的阿白找到方向。</p>
+      <div class="intro-actions">
+        <Button href="/levels/fake-cross">进入第 1 关</Button>
+        <Button href="/levels" variant="secondary">查看 8 关地图</Button>
+      </div>
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .picturebook-intro,
+  .picturebook-next {
+    display: grid;
+    gap: var(--space-md);
+    max-width: 720px;
+    margin-inline: auto;
+    padding: var(--space-xl);
+    border: 1px solid rgba(219, 151, 46, 0.24);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(135deg, rgba(255, 247, 224, 0.78), rgba(255, 255, 255, 0.92)),
+      var(--color-surface);
+  }
+
+  .picturebook-intro p,
+  .picturebook-next p {
+    max-width: 56ch;
+  }
+
+  .intro-actions {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .reader {
+    display: grid;
+    gap: var(--space-xl);
+    justify-items: center;
+  }
+
+  .book-page {
+    display: grid;
+    gap: var(--space-sm);
+    width: min(100%, 520px);
+    margin: 0;
+  }
+
+  .book-page img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid rgba(39, 39, 42, 0.1);
+    border-radius: var(--radius-md);
+    background: #f7ead2;
+    box-shadow: 0 14px 36px rgba(39, 39, 42, 0.08);
+  }
+
+  .book-page figcaption {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    text-align: center;
+  }
+
+  @media (min-width: 720px) {
+    .picturebook-intro,
+    .picturebook-next {
+      padding: var(--space-2xl);
+    }
+
+    .intro-actions {
+      grid-template-columns: max-content max-content;
+    }
+  }
+</style>

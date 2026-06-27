@@ -1,0 +1,90 @@
+---
+interface Props {
+  slots: {
+    original: string;
+    completed: string;
+    exploded: string;
+  };
+}
+
+const { slots } = Astro.props;
+const items = [
+  { label: "原始状态", value: slots.original },
+  { label: "完成状态", value: slots.completed },
+  { label: "详细展开图", value: slots.exploded },
+];
+---
+
+<section class="media-slots" aria-labelledby="media-title">
+  <h2 id="media-title">图片位置</h2>
+  <div class="slot-grid">
+    {
+      items.map((item) => (
+        <figure class="media-slot">
+          <div class="placeholder" aria-hidden="true">
+            <span></span>
+          </div>
+          <figcaption>
+            <strong>{item.label}</strong>
+            <p>{item.value}</p>
+          </figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .media-slots {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .slot-grid {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .media-slot {
+    display: grid;
+    gap: var(--space-sm);
+    min-width: 0;
+    margin: 0;
+  }
+
+  .placeholder {
+    display: grid;
+    aspect-ratio: 4 / 3;
+    place-items: center;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .placeholder span {
+    display: block;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background:
+      linear-gradient(90deg, transparent 48%, var(--color-border) 48%, var(--color-border) 52%, transparent 52%),
+      linear-gradient(0deg, transparent 48%, var(--color-border) 48%, var(--color-border) 52%, transparent 52%);
+  }
+
+  figcaption {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  figcaption p {
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+
+  @media (min-width: 720px) {
+    .slot-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

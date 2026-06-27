@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import LevelCard from "./LevelCard.astro";
+
+interface Props {
+  levels: CollectionEntry<"levels">[];
+  stages: Record<string, string>;
+  numbered?: boolean;
+}
+
+const { levels, stages, numbered = false } = Astro.props;
+---
+
+<ol class:list={["level-map", numbered && "is-numbered"]}>
+  {
+    levels.map((level) => (
+      <LevelCard
+        level={level}
+        stageLabel={stages[level.data.stage]}
+        variant={numbered ? "numbered" : "compact"}
+      />
+    ))
+  }
+</ol>
+
+<style>
+  .level-map {
+    display: grid;
+    gap: var(--space-md);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .level-map.is-numbered :global(.card) {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  @media (max-width: 420px) {
+    .level-map.is-numbered :global(.card) {
+      gap: var(--space-md);
+      padding: var(--space-md);
+    }
+  }
+
+  @media (min-width: 720px) {
+    .level-map:not(.is-numbered) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

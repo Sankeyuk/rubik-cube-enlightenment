@@ -1,0 +1,151 @@
+---
+import "../styles/global.css";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import { absoluteAssetUrl, absoluteSiteUrl, defaultOgImage } from "../data/seo";
+import { site } from "../data/site";
+import { sitePath } from "../utils/paths";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalPath?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogType?: "website" | "article";
+  ogImage?: string;
+  noindex?: boolean;
+  analyticsEvent?: string;
+  analyticsProps?: Record<string, string | number | boolean | undefined>;
+}
+
+const {
+  title = site.chineseTitle ? `${site.title} · ${site.chineseTitle}` : site.title,
+  description = site.description,
+  canonicalPath = Astro.url.pathname,
+  ogTitle = title,
+  ogDescription = description,
+  ogType = "website",
+  ogImage = defaultOgImage,
+  noindex = false,
+  analyticsEvent,
+  analyticsProps = {},
+} = Astro.props;
+
+const canonicalUrl = absoluteSiteUrl(canonicalPath);
+const ogImageUrl = absoluteAssetUrl(ogImage);
+const analyticsPropsJson = JSON.stringify(analyticsProps);
+const analyticsEndpoint = import.meta.env.PUBLIC_RUBIK_ANALYTICS_ENDPOINT ?? "";
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href={sitePath("/favicon.svg")} />
+    <link rel="icon" href={sitePath("/favicon.ico")} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <SiteHeader />
+    <slot />
+    <SiteFooter />
+    <script define:vars={{ analyticsEvent, analyticsPropsJson, analyticsEndpoint }}>
+      (() => {
+        const parseProps = (value) => {
+          if (!value) return {};
+          try {
+            return JSON.parse(value);
+          } catch {
+            return {};
+          }
+        };
+
+        const sanitizeProps = (props = {}) => {
+          const result = {};
+          Object.entries(props).forEach(([key, value]) => {
+            if (!/^[a-zA-Z0-9_:-]{1,48}$/.test(key)) return;
+            if (typeof value === "string") {
+              result[key] = value.slice(0, 160);
+              return;
+            }
+            if (typeof value === "number" && Number.isFinite(value)) {
+              result[key] = value;
+              return;
+            }
+            if (typeof value === "boolean") {
+              result[key] = value;
+            }
+          });
+          return result;
+        };
+
+        const sendToCollector = (eventName, props) => {
+          if (!analyticsEndpoint) return;
+
+          const payload = JSON.stringify({
+            event: eventName,
+            path: window.location.pathname,
+            props,
+          });
+
+          fetch(analyticsEndpoint, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: payload,
+            credentials: "omit",
+            keepalive: true,
+          }).catch(() => {});
+        };
+
+        const track = (eventName, props = {}) => {
+          if (!eventName) return;
+
+          const safeProps = sanitizeProps(props);
+          const analyticsWindow = window;
+          window.dispatchEvent(new CustomEvent("rubik:analytics", {
+            detail: { event: eventName, props: safeProps },
+          }));
+
+          if (typeof analyticsWindow.plausible === "function") {
+            analyticsWindow.plausible(eventName, { props: safeProps });
+          }
+
+          if (analyticsWindow.umami && typeof analyticsWindow.umami.track === "function") {
+            analyticsWindow.umami.track(eventName, safeProps);
+          }
+
+          sendToCollector(eventName, safeProps);
+        };
+
+        window.rubikTrack = track;
+
+        if (analyticsEvent) {
+          track(analyticsEvent, parseProps(analyticsPropsJson));
+        }
+
+        document.addEventListener("click", (event) => {
+          if (!(event.target instanceof Element)) return;
+
+          const target = event.target.closest("[data-analytics-event]");
+          if (!target) return;
+
+          track(target.dataset.analyticsEvent, parseProps(target.dataset.analyticsProps));
+        });
+      })();
+    </script>
+  </body>
+</html>

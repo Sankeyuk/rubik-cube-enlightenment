@@ -1,0 +1,219 @@
+---
+import { getCollection, render } from "astro:content";
+import PageShell from "../../components/layout/PageShell.astro";
+import Badge from "../../components/ui/Badge.astro";
+import Button from "../../components/ui/Button.astro";
+import Callout from "../../components/ui/Callout.astro";
+import Card from "../../components/ui/Card.astro";
+import { getStorySeo } from "../../data/seo";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sitePath } from "../../utils/paths";
+
+export async function getStaticPaths() {
+  const stories = await getCollection("stories");
+  return stories.map((story) => ({
+    params: { slug: story.data.slug },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+const seo = getStorySeo(story.data.slug, {
+  title: `${story.data.title} · 玩转魔方，有手就行。`,
+  description: `魔方启蒙故事单元：${story.data.title}。`,
+});
+---
+
+<BaseLayout
+  {...seo}
+  analyticsEvent="story_detail_view"
+  analyticsProps={{ story_slug: story.data.slug, path: `/story/${story.data.slug}` }}
+>
+  <PageShell tone="quiet">
+    <section class="story-hero" aria-labelledby="story-title">
+      <div class="story-kicker">
+        <Badge tone="green">故事单元</Badge>
+        <Badge tone="yellow">{story.data.status}</Badge>
+      </div>
+      <h1 id="story-title">{story.data.title}</h1>
+      <p>基础文本版先承载故事和画面槽位。后续可以替换为绘本分镜、漫画图或角色图。</p>
+      <div class="story-actions">
+        <Button href="/story" variant="secondary">返回绘本入口</Button>
+        {story.data.relatedLevelSlug && (
+          <Button
+            href={`/levels/${story.data.relatedLevelSlug}`}
+            analyticsEvent="story_to_level_click"
+            analyticsProps={{
+              story_slug: story.data.slug,
+              level_slug: story.data.relatedLevelSlug,
+              source_path: `/story/${story.data.slug}`,
+            }}
+          >
+            查看关联关卡
+          </Button>
+        )}
+      </div>
+    </section>
+
+    <Card as="section">
+      <Badge tone="blue">故事正文</Badge>
+      <div class="story-body">
+        <Content />
+      </div>
+    </Card>
+
+    <Card as="section">
+      <Badge tone="green">主题关联</Badge>
+      <dl class="story-meta">
+        {story.data.themeColor && (
+          <>
+            <dt>主题颜色</dt>
+            <dd>{story.data.themeColor}</dd>
+          </>
+        )}
+        {story.data.animalSkin && (
+          <>
+            <dt>动物皮肤</dt>
+            <dd>{story.data.animalSkin}</dd>
+          </>
+        )}
+        {story.data.relatedStage && (
+          <>
+            <dt>学习阶段</dt>
+            <dd>{story.data.relatedStage}</dd>
+          </>
+        )}
+        {story.data.relatedLevelSlug && (
+          <>
+            <dt>可选关卡</dt>
+            <dd>{story.data.relatedLevelSlug}</dd>
+          </>
+        )}
+      </dl>
+    </Card>
+
+    <Card as="section">
+      <Badge tone="yellow">漫画 / 绘本画面槽</Badge>
+      <h2>按网站位置生产，不先锁死最终美术</h2>
+      <div class="frame-list">
+        {
+          story.data.frames.map((frame) => (
+            <div>
+              {frame.src && (
+                <img src={sitePath(frame.src)} alt={frame.alt ?? frame.purpose} loading="lazy" />
+              )}
+              <strong>{frame.ratio}</strong>
+              <p>{frame.purpose}</p>
+              <small>{frame.size} · {frame.status}</small>
+              <p class="prompt">{frame.prompt}</p>
+            </div>
+          ))
+        }
+      </div>
+    </Card>
+
+    {story.data.diagramRefs && story.data.diagramRefs.length > 0 && (
+      <Card as="section">
+        <Badge tone="blue">关联示意图</Badge>
+        <ul class="ref-list">
+          {story.data.diagramRefs.map((ref) => <li>{ref}</li>)}
+        </ul>
+      </Card>
+    )}
+
+    <Callout tone="warning">
+      <strong>第一阶段边界</strong>
+      <p>故事页只做文本和画面需求，不做完整漫画、不强制每个故事绑定具体教程。</p>
+    </Callout>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .story-hero,
+  .story-kicker,
+  .story-actions {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .story-hero {
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .story-kicker {
+    grid-template-columns: max-content max-content;
+  }
+
+  .story-body :global(h2) {
+    margin-top: 0;
+  }
+
+  .story-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-sm) var(--space-md);
+  }
+
+  .story-meta dt {
+    font-weight: 800;
+  }
+
+  .story-meta dd {
+    margin: 0;
+    color: var(--color-muted-text);
+  }
+
+  .frame-list {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .frame-list div {
+    display: grid;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .frame-list img {
+    display: block;
+    width: 100%;
+    max-height: 620px;
+    object-fit: contain;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .frame-list p {
+    margin: 0;
+  }
+
+  .frame-list small,
+  .prompt,
+  .ref-list {
+    color: var(--color-muted-text);
+  }
+
+  .ref-list {
+    display: grid;
+    gap: var(--space-sm);
+    padding-left: 1.2rem;
+  }
+
+  @media (min-width: 720px) {
+    .story-hero {
+      padding: var(--space-2xl);
+    }
+
+    .story-actions {
+      grid-template-columns: max-content max-content;
+    }
+  }
+</style>

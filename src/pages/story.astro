@@ -1,0 +1,237 @@
+---
+import { getCollection } from "astro:content";
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Callout from "../components/ui/Callout.astro";
+import Card from "../components/ui/Card.astro";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { sitePath } from "../utils/paths";
+
+const stories = await getCollection("stories");
+---
+
+<BaseLayout {...routeSeo["/story"]} analyticsEvent="story_index_view" analyticsProps={{ path: "/story" }}>
+  <PageShell>
+    <section class="story-hero" aria-labelledby="story-title">
+      <Badge tone="green">动物绘本引入</Badge>
+      <h1 id="story-title">先让孩子觉得色块背后有故事</h1>
+      <p>动物绘本是一套角色衣服，用来引起孩子对魔方的好奇心：这些小色块不是没有意义的色块，而是有故事在里面。</p>
+      <div class="story-actions">
+        <Button href="/levels">继续进入教程</Button>
+        <Button
+          href="/materials"
+          variant="secondary"
+          analyticsEvent="materials_click"
+          analyticsProps={{ source_path: "/story", source_label: "story_hero" }}
+        >
+          查看材料方向
+        </Button>
+      </div>
+    </section>
+
+    <section class="story-section" aria-labelledby="world-title">
+      <div class="section-heading">
+        <Badge tone="blue">世界观占位</Badge>
+        <h2 id="world-title">故事先服务好奇心，不改写整套教程</h2>
+      </div>
+      <div class="cards-grid">
+        <Card>
+          <h3>Crocodile 皮肤</h3>
+          <p>白色主题可先用鳄鱼皮肤作为占位。它是颜色和阶段的视觉映射，不是必须绑定某一个关卡剧情。</p>
+        </Card>
+        <Card>
+          <h3>Giraffe 皮肤</h3>
+          <p>黄色主题可考虑长颈鹿皮肤。后续绘本风格稳定后，再替换真实角色图和故事语言。</p>
+        </Card>
+        <Card>
+          <h3>故事单元</h3>
+          <p>故事单元用于引入想象，可以关联颜色、阶段或页面位置，但不强制覆盖全部关卡。</p>
+        </Card>
+      </div>
+    </section>
+
+    <section class="story-section" aria-labelledby="units-title">
+      <div class="section-heading">
+        <Badge tone="green">故事单元</Badge>
+        <h2 id="units-title">先把绘本内容放进可管理的槽位</h2>
+      </div>
+      <div class="story-units">
+        {
+          stories.map((story) => (
+            <Card>
+              <div class="story-card-head">
+                <h3>{story.data.title}</h3>
+                <Badge tone="yellow">{story.data.status}</Badge>
+              </div>
+              <p>{story.body}</p>
+              <dl class="story-meta">
+                {story.data.themeColor && (
+                  <>
+                    <dt>主题</dt>
+                    <dd>{story.data.themeColor}</dd>
+                  </>
+                )}
+                {story.data.animalSkin && (
+                  <>
+                    <dt>皮肤</dt>
+                    <dd>{story.data.animalSkin}</dd>
+                  </>
+                )}
+              </dl>
+              <div class="frame-list">
+                {story.data.frames.map((frame) => (
+                  <div>
+                    {frame.src && (
+                      <img src={sitePath(frame.src)} alt={frame.alt ?? frame.purpose} loading="lazy" />
+                    )}
+                    <strong>{frame.ratio}</strong>
+                    <p>{frame.purpose}</p>
+                    <small>{frame.size} · {frame.status}</small>
+                  </div>
+                ))}
+              </div>
+              <Button href={`/story/${story.data.slug}`} variant="secondary">查看故事单元</Button>
+            </Card>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="story-section" aria-labelledby="materials-title">
+      <div class="section-heading">
+        <Badge tone="yellow">物料需求</Badge>
+        <h2 id="materials-title">后续美术要按网站位置生产</h2>
+      </div>
+      <div class="spec-list">
+        <Card>
+          <h3>首页主视觉</h3>
+          <p>建议 16:9，1600×900。后续放绘本主视觉或角色群像。</p>
+        </Card>
+        <Card>
+          <h3>故事封面</h3>
+          <p>建议 4:3，1200×900。用于故事入口和故事单元列表。</p>
+        </Card>
+        <Card>
+          <h3>故事分镜</h3>
+          <p>建议 1:1 或 4:3。先留槽位，后续可交给图形工具或绘本流程生产。</p>
+        </Card>
+        <Card>
+          <h3>关卡主题图</h3>
+          <p>建议 4:3，1200×900。用于把动物皮肤和学习阶段连接起来。</p>
+        </Card>
+      </div>
+    </section>
+
+    <Callout tone="warning">
+      <strong>第一阶段边界</strong>
+      <p>这里先做基础文本版和画面槽位，不做最终绘本美术、不做完整漫画、不逐关绑定剧情。</p>
+    </Callout>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .story-hero,
+  .story-section {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .story-hero {
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .story-hero p {
+    max-width: 62ch;
+  }
+
+  .story-actions,
+  .cards-grid,
+  .story-units,
+  .spec-list,
+  .section-heading {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .story-card-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--space-md);
+  }
+
+  .story-meta {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-xs) var(--space-sm);
+    margin: var(--space-md) 0 0;
+  }
+
+  .story-meta dt {
+    font-weight: 700;
+  }
+
+  .story-meta dd {
+    margin: 0;
+    color: var(--color-muted-text);
+  }
+
+  .frame-list {
+    display: grid;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .frame-list div {
+    display: grid;
+    gap: var(--space-sm);
+    min-height: 96px;
+    padding: var(--space-md);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .frame-list img {
+    display: block;
+    width: 100%;
+    max-height: 520px;
+    object-fit: contain;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .frame-list strong,
+  .frame-list small {
+    display: block;
+  }
+
+  .frame-list p {
+    margin: var(--space-xs) 0;
+  }
+
+  .frame-list small {
+    color: var(--color-muted-text);
+  }
+
+  @media (min-width: 720px) {
+    .story-hero {
+      padding: var(--space-2xl);
+    }
+
+    .story-actions {
+      grid-template-columns: max-content max-content;
+    }
+
+    .cards-grid,
+    .spec-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

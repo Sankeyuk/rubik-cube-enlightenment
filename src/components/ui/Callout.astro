@@ -1,0 +1,37 @@
+---
+interface Props {
+  tone?: "info" | "success" | "warning";
+}
+
+const { tone = "info" } = Astro.props;
+---
+
+<aside class:list={["callout", `tone-${tone}`]}>
+  <slot />
+</aside>
+
+<style>
+  .callout {
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .tone-info {
+    border-color: rgba(74, 144, 226, 0.24);
+    background: rgba(74, 144, 226, 0.08);
+  }
+
+  .tone-success {
+    border-color: rgba(98, 184, 121, 0.28);
+    background: rgba(98, 184, 121, 0.1);
+  }
+
+  .tone-warning {
+    border-color: rgba(245, 200, 76, 0.36);
+    background: rgba(245, 200, 76, 0.12);
+  }
+</style>

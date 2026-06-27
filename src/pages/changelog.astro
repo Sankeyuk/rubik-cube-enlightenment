@@ -1,0 +1,405 @@
+---
+import { getCollection } from "astro:content";
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { sitePath } from "../utils/paths";
+
+const entries = (await getCollection("changelog")).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+);
+
+const typeLabel = {
+  feature: "新功能",
+  improvement: "优化",
+  bugfix: "Bug 修复",
+} as const;
+
+const typeTone = {
+  feature: "blue",
+  improvement: "green",
+  bugfix: "yellow",
+} as const;
+
+const projectLabel = {
+  website: "网站项目",
+  "color-editor": "魔方颜色编辑器",
+  "picturebook-skin": "魔方内容绘本化",
+} as const;
+
+function formatDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  return `${year}年${month}月${day}日`;
+}
+
+function resolveHref(href?: string) {
+  if (!href) return undefined;
+  return sitePath(href);
+}
+
+function countBy<T extends string>(items: T[]) {
+  return items.reduce(
+    (result, item) => {
+      result[item] = (result[item] ?? 0) + 1;
+      return result;
+    },
+    {} as Record<T, number>,
+  );
+}
+
+const typeCounts = countBy(entries.map((entry) => entry.data.type));
+const tagCounts = Object.entries(countBy(entries.flatMap((entry) => entry.data.tags))).sort(
+  (a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "zh-CN"),
+);
+---
+
+<BaseLayout {...routeSeo["/changelog"]}>
+  <PageShell>
+    <section class="changelog-hero" aria-labelledby="changelog-title">
+      <Badge tone="blue">Product Log</Badge>
+      <div class="hero-copy">
+        <h1 id="changelog-title">魔方启蒙产品更新记录</h1>
+        <p>记录网站、颜色编辑器和绘本化内容三个项目的建设过程。这里按产品类型和建设标签整理，避免暴露本地开发路径。</p>
+      </div>
+      <div class="hero-stats" aria-label="更新记录概览">
+        <span>
+          <strong>{entries.length}</strong>
+          <small>条记录</small>
+        </span>
+        <span>
+          <strong>{entries[0] ? formatDate(entries[0].data.date) : "暂无"}</strong>
+          <small>最近更新</small>
+        </span>
+        <span>
+          <strong>{tagCounts.length}</strong>
+          <small>建设标签</small>
+        </span>
+      </div>
+    </section>
+
+    <section class="dashboard" aria-label="更新统计">
+      <article class="stat-panel">
+        <h2>类型分布</h2>
+        <div class="metric-grid">
+          {Object.entries(typeLabel).map(([type, label]) => (
+            <span>
+              <strong>{typeCounts[type as keyof typeof typeLabel] ?? 0}</strong>
+              <small>{label}</small>
+            </span>
+          ))}
+        </div>
+      </article>
+
+      <article class="stat-panel">
+        <h2>标签统计</h2>
+        <div class="tag-cloud">
+          {tagCounts.map(([tag, count]) => (
+            <span>
+              {tag}
+              <strong>{count}</strong>
+            </span>
+          ))}
+        </div>
+      </article>
+    </section>
+
+    <section class="timeline" aria-label="产品更新时间线">
+      {
+        entries.map((entry) => (
+          <article class="release-card">
+            <div class="release-marker" aria-hidden="true" />
+            <div class="release-body">
+              <div class="release-meta">
+                <time datetime={entry.data.date}>{formatDate(entry.data.date)}</time>
+                <span class:list={["type-pill", `tone-${typeTone[entry.data.type]}`]}>
+                  {typeLabel[entry.data.type]}
+                </span>
+                <span>{projectLabel[entry.data.project]}</span>
+              </div>
+              <h2>{entry.data.title}</h2>
+              <p>{entry.data.summary}</p>
+
+              <div class="release-tags" aria-label={`${entry.data.title} 标签`}>
+                {entry.data.tags.map((tag) => (
+                  <span>{tag}</span>
+                ))}
+              </div>
+
+              <div class="release-section">
+                <h3>这次改变</h3>
+                <ul>
+                  {entry.data.highlights.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {entry.data.documents?.length ? (
+                <div class="release-links" aria-label={`${entry.data.title} 相关入口`}>
+                  {entry.data.documents.map((document) => {
+                    const href = resolveHref(document.href);
+                    return href ? (
+                      <a href={href}>{document.label}</a>
+                    ) : (
+                      <span>{document.label}</span>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
+          </article>
+        ))
+      }
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .changelog-hero,
+  .stat-panel,
+  .stat-panel {
+    display: grid;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .hero-copy {
+    display: grid;
+    gap: var(--space-md);
+    max-width: 760px;
+  }
+
+  .hero-stats,
+  .dashboard,
+  .metric-grid {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .hero-stats span,
+  .metric-grid span,
+  .metric-grid span {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .hero-stats strong,
+  .metric-grid strong,
+  .metric-grid strong {
+    color: var(--color-on-neutral);
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .hero-stats small,
+  .metric-grid small {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+
+  .tag-cloud,
+  .release-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .tag-cloud span,
+  .release-tags span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 28px;
+    padding: 4px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+
+  .tag-cloud strong {
+    color: var(--color-on-neutral);
+    font-size: var(--font-size-caption);
+  }
+
+  .timeline {
+    position: relative;
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .timeline::before {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 9px;
+    width: 2px;
+    background: var(--color-border);
+    content: "";
+  }
+
+  .release-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: var(--space-md);
+  }
+
+  .release-marker {
+    z-index: 1;
+    width: 20px;
+    height: 20px;
+    margin-top: var(--space-lg);
+    border: 4px solid var(--color-neutral);
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.26);
+  }
+
+  .release-body {
+    display: grid;
+    gap: var(--space-md);
+    min-width: 0;
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .release-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .release-meta time,
+  .release-meta span {
+    min-height: 26px;
+    padding: 4px 9px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+
+  .release-meta .type-pill {
+    color: var(--color-on-neutral);
+  }
+
+  .type-pill.tone-blue {
+    border-color: rgba(74, 144, 226, 0.28);
+    background: rgba(74, 144, 226, 0.1);
+  }
+
+  .type-pill.tone-green {
+    border-color: rgba(98, 184, 121, 0.34);
+    background: rgba(98, 184, 121, 0.14);
+  }
+
+  .type-pill.tone-yellow {
+    border-color: rgba(245, 200, 76, 0.38);
+    background: rgba(245, 200, 76, 0.16);
+  }
+
+  .release-body h2 {
+    font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.7rem);
+  }
+
+  .release-section {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .release-section h3 {
+    font-size: 1rem;
+  }
+
+  .release-section ul {
+    display: grid;
+    gap: var(--space-xs);
+    padding-left: 1.1rem;
+  }
+
+  .release-section li {
+    color: var(--color-muted-text);
+  }
+
+  .release-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .release-links a,
+  .release-links span {
+    min-height: 32px;
+    padding: 6px 11px;
+    border: 1px solid rgba(74, 144, 226, 0.25);
+    border-radius: var(--radius-full);
+    background: rgba(74, 144, 226, 0.08);
+    color: var(--color-on-neutral);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    text-decoration: none;
+  }
+
+  @media (min-width: 760px) {
+    .changelog-hero {
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+      align-items: end;
+      padding: var(--space-2xl);
+    }
+
+    .changelog-hero .badge {
+      grid-column: 1 / -1;
+    }
+
+    .hero-stats {
+      grid-template-columns: 1fr;
+    }
+
+    .dashboard {
+      grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr);
+    }
+
+    .metric-grid,
+    .metric-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .stat-panel {
+      padding: var(--space-xl);
+    }
+
+    .release-card {
+      grid-template-columns: 24px minmax(0, 1fr);
+      gap: var(--space-lg);
+    }
+
+    .timeline::before {
+      left: 11px;
+    }
+
+    .release-marker {
+      width: 24px;
+      height: 24px;
+    }
+
+    .release-body {
+      padding: var(--space-xl);
+    }
+  }
+</style>

@@ -1,0 +1,24 @@
+---
+import { site } from "../../data/site";
+---
+
+<footer class="site-footer">
+  <p>{site.chineseTitle ? `${site.title} / ${site.chineseTitle}` : site.title}</p>
+  <p>免费公开教程。先帮助孩子看懂，再慢慢做到。</p>
+</footer>
+
+<style>
+  .site-footer {
+    display: grid;
+    gap: var(--space-xs);
+    width: min(100% - 32px, var(--page-max-width));
+    margin: var(--space-3xl) auto 0;
+    padding: var(--space-xl) 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .site-footer p {
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+</style>

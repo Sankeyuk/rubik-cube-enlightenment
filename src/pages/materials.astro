@@ -1,0 +1,144 @@
+---
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Callout from "../components/ui/Callout.astro";
+import Card from "../components/ui/Card.astro";
+import { picturebookPages, villageAnimals } from "../data/animalSkin";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { sitePath } from "../utils/paths";
+
+const previewPages = [picturebookPages[0], picturebookPages[2], picturebookPages[9]];
+---
+
+<BaseLayout {...routeSeo["/materials"]} analyticsEvent="materials_view" analyticsProps={{ path: "/materials" }}>
+  <PageShell>
+    <section class="page-intro" aria-labelledby="materials-title">
+      <Badge tone="yellow">产品方向占位</Badge>
+      <h1 id="materials-title">后续可能做成拿在手上的学习材料</h1>
+      <p>当前页面展示方向：绘本包、角色贴纸、头像贴纸和打印关卡卡仍在验证阶段。这里不是售卖页，也不承诺已有完整付费产品。</p>
+    </section>
+
+    <section class="material-grid" aria-label="材料方向">
+      <Card>
+        <div class="book-previews" aria-label="绘本包缩略图">
+          {previewPages.map((page) => <img src={sitePath(page.src)} alt={page.alt} loading="lazy" />)}
+        </div>
+        <h2>方块村绘本包</h2>
+        <p>把 10 页竖屏绘本整理成可连续阅读、可打印预览的故事入口，让孩子先理解颜色街区和帮动物回家。</p>
+      </Card>
+      <Card>
+        <div class="sticker-row" aria-label="角色贴纸预览">
+          {villageAnimals.map((animal) => <img src={sitePath(animal.sticker)} alt={animal.alt} loading="lazy" />)}
+        </div>
+        <h2>角色贴纸</h2>
+        <p>6 个动物可以做成关卡页角标、奖励贴纸或家庭陪学卡上的轻角色，不覆盖教程步骤图。</p>
+      </Card>
+      <Card>
+        <div class="avatar-row" aria-label="头像贴纸预览">
+          {villageAnimals.map((animal) => <img src={sitePath(animal.avatar)} alt={animal.alt} loading="lazy" />)}
+        </div>
+        <h2>头像贴纸</h2>
+        <p>头像版适合关卡地图、1.8cm 魔方贴纸方向和小尺寸打印材料，优先保持清楚可认。</p>
+      </Card>
+      <Card>
+        <h2>打印关卡卡</h2>
+        <p>把网页关卡拆成可以放在桌边的练习卡，帮助家长和孩子不必一直翻网页。</p>
+      </Card>
+      <Card>
+        <h2>家长陪学卡</h2>
+        <p>把“先观察、轻轻的手、一次只做一个目标”做成家长提醒卡，服务练习现场。</p>
+      </Card>
+    </section>
+
+    <Callout tone="warning">
+      <strong>当前状态</strong>
+      <p>产品仍在验证阶段。本阶段不接真实表单、不接支付、不做完整销售转化。</p>
+    </Callout>
+
+    <section class="connect" aria-labelledby="connect-title">
+      <h2 id="connect-title">先回到教程和故事</h2>
+      <p>主要页面完成后，再决定是否加入兴趣收集、二维码或轻量反馈入口。</p>
+      <div class="actions">
+        <Button href="/story">看魔方故事</Button>
+        <Button href="/levels" variant="secondary">看教程关卡</Button>
+      </div>
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .page-intro,
+  .connect {
+    display: grid;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .material-grid,
+  .actions,
+  .book-previews,
+  .sticker-row,
+  .avatar-row {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .book-previews {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .book-previews img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+    border: 1px solid rgba(39, 39, 42, 0.1);
+    border-radius: var(--radius-sm);
+    background: #f7ead2;
+  }
+
+  .sticker-row,
+  .avatar-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    justify-items: center;
+    padding: var(--space-md);
+    border: 1px solid rgba(219, 151, 46, 0.22);
+    border-radius: var(--radius-md);
+    background: rgba(255, 247, 224, 0.54);
+  }
+
+  .sticker-row img,
+  .avatar-row img {
+    display: block;
+    width: 68px;
+    height: 68px;
+    object-fit: contain;
+  }
+
+  .avatar-row img {
+    border: 1px solid rgba(39, 39, 42, 0.08);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+  }
+
+  @media (min-width: 720px) {
+    .page-intro,
+    .connect {
+      padding: var(--space-2xl);
+    }
+
+    .material-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .actions {
+      grid-template-columns: max-content max-content;
+    }
+  }
+</style>

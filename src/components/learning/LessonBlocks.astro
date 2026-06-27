@@ -1,0 +1,366 @@
+---
+import { sitePath } from "../../utils/paths";
+
+interface LessonImage {
+  label: string;
+  src?: string;
+  filename?: string;
+  alt: string;
+  ratio?: string;
+  status: "ready" | "needed" | "placeholder";
+}
+
+interface LessonItem {
+  title: string;
+  body?: string[];
+  images?: LessonImage[];
+}
+
+interface LessonBlock {
+  id: string;
+  title: string;
+  eyebrow?: string;
+  kind: "goal" | "observe" | "formula" | "states" | "cases" | "pass" | "next";
+  body?: string[];
+  formula?: string;
+  videoCue?: string;
+  qa?: {
+    question: string;
+    answer: string;
+  };
+  mnemonic?: string;
+  notes?: string[];
+  button?: string;
+  buttonHref?: string;
+  images?: LessonImage[];
+  items?: LessonItem[];
+}
+
+interface Props {
+  blocks: LessonBlock[];
+}
+
+const { blocks } = Astro.props;
+---
+
+<section class="lesson-blocks" aria-label="图文教学">
+  {
+    blocks.map((block) => (
+      <article class:list={["lesson-block", `kind-${block.kind}`]} id={block.id} aria-label={block.title}>
+        <div class="lesson-heading">
+          {block.eyebrow && <span>{block.eyebrow}</span>}
+          <h2>{block.title}</h2>
+        </div>
+
+        {block.formula && (
+          <div class="formula-card" aria-label="核心动作">
+            <strong>{block.formula}</strong>
+          </div>
+        )}
+
+        {block.body && block.body.length > 0 && (
+          <div class="block-copy">
+            {block.body.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        )}
+
+        {block.videoCue && (
+          <div class="support-card">
+            <strong>视频位置：</strong>
+            <span>{block.videoCue}</span>
+          </div>
+        )}
+
+        {block.qa && (
+          <div class="qa-card" aria-label="问答">
+            <p>
+              <strong>Q</strong>
+              <span>{block.qa.question}</span>
+            </p>
+            <p>
+              <strong>A</strong>
+              <span>{block.qa.answer}</span>
+            </p>
+          </div>
+        )}
+
+        {block.mnemonic && (
+          <div class="support-card">
+            <strong>口诀：</strong>
+            <span>{block.mnemonic}</span>
+          </div>
+        )}
+
+        {block.notes && block.notes.length > 0 && (
+          <div class="note-list">
+            {block.notes.map((note) => <p>{note}</p>)}
+          </div>
+        )}
+
+        {block.images && block.images.length > 0 && (
+          <div class="image-strip">
+            {
+              block.images.map((image) => (
+                <figure
+                  class:list={["lesson-image", image.status !== "ready" && "is-missing"]}
+                  style={image.ratio ? `--image-ratio: ${image.ratio.replace(":", " / ")};` : undefined}
+                >
+                  {image.src ? (
+                    <img src={sitePath(image.src)} alt={image.alt} loading="lazy" />
+                  ) : (
+                    <div class="image-placeholder" aria-label={`${image.label} 待补`}>
+                      <span>{image.filename ?? "待补图片"}</span>
+                    </div>
+                  )}
+                  {image.status !== "ready" && (
+                    <figcaption>
+                      <strong>{image.label}</strong>
+                      <small>{image.status}</small>
+                    </figcaption>
+                  )}
+                </figure>
+              ))
+            }
+          </div>
+        )}
+
+        {block.items && block.items.length > 0 && (
+          <div class:list={["item-list", block.kind === "cases" && "case-list"]}>
+            {
+              block.items.map((item) => (
+                <section class="lesson-item">
+                  <h3>{item.title}</h3>
+                  {item.images && item.images.length > 0 && (
+                    <div class="image-strip">
+                      {
+                        item.images.map((image) => (
+                          <figure
+                            class:list={["lesson-image", image.status !== "ready" && "is-missing"]}
+                            style={image.ratio ? `--image-ratio: ${image.ratio.replace(":", " / ")};` : undefined}
+                          >
+                            {image.src ? (
+                              <img src={sitePath(image.src)} alt={image.alt} loading="lazy" />
+                            ) : (
+                              <div class="image-placeholder" aria-label={`${image.label} 待补`}>
+                                <span>{image.filename ?? "待补图片"}</span>
+                              </div>
+                            )}
+                            {image.status !== "ready" && (
+                              <figcaption>
+                                <strong>{image.label}</strong>
+                                <small>{image.status}</small>
+                              </figcaption>
+                            )}
+                          </figure>
+                        ))
+                      }
+                    </div>
+                  )}
+                  {item.body && item.body.length > 0 && (
+                    <div class="block-copy">
+                      {item.body.map((paragraph) => <p>{paragraph}</p>)}
+                    </div>
+                  )}
+                </section>
+              ))
+            }
+          </div>
+        )}
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  .lesson-blocks {
+    display: grid;
+    gap: var(--space-lg);
+  }
+
+  .lesson-block,
+  .lesson-item,
+  .lesson-heading {
+    display: grid;
+    gap: var(--space-md);
+    min-width: 0;
+  }
+
+  .lesson-block {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .lesson-heading {
+    gap: var(--space-xs);
+  }
+
+  .lesson-heading span {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-small);
+    font-weight: 800;
+  }
+
+  .lesson-heading h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.35rem, 3vw, 2rem);
+    line-height: var(--line-height-heading);
+  }
+
+  .formula-card {
+    display: grid;
+    min-height: 88px;
+    place-items: center;
+    border: 1px solid rgba(74, 144, 226, 0.24);
+    border-radius: var(--radius-lg);
+    background: rgba(74, 144, 226, 0.08);
+  }
+
+  .formula-card strong {
+    color: var(--color-primary);
+    font-size: clamp(2rem, 9vw, 4rem);
+    line-height: 1;
+  }
+
+  .block-copy {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .block-copy p {
+    margin: 0;
+  }
+
+  .support-card,
+  .qa-card,
+  .note-list {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .support-card {
+    display: flex;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    line-height: var(--line-height-body);
+  }
+
+  .support-card strong,
+  .qa-card strong {
+    color: var(--color-primary);
+  }
+
+  .qa-card {
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .qa-card p {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: var(--space-sm);
+    margin: 0;
+    line-height: var(--line-height-body);
+  }
+
+  .qa-card strong {
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border-radius: var(--radius-full);
+    background: rgba(74, 144, 226, 0.12);
+  }
+
+  .note-list {
+    display: grid;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  .note-list p {
+    margin: 0;
+    padding-left: var(--space-sm);
+    border-left: 4px solid var(--color-success);
+    line-height: var(--line-height-body);
+  }
+
+  .image-strip,
+  .item-list {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .lesson-image {
+    display: grid;
+    gap: var(--space-sm);
+    min-width: 0;
+    margin: 0;
+  }
+
+  .lesson-image img,
+  .image-placeholder {
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .lesson-image img {
+    display: block;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  .image-placeholder {
+    display: grid;
+    aspect-ratio: var(--image-ratio, 4 / 3);
+    place-items: center;
+    padding: var(--space-md);
+    border-style: dashed;
+    color: var(--color-muted-text);
+    text-align: center;
+  }
+
+  figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+
+  figcaption strong {
+    color: var(--color-on-neutral);
+  }
+
+  .lesson-item {
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 720px) {
+    .lesson-block {
+      padding: 0;
+    }
+
+    .case-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .step-nav a {
+      min-height: 38px;
+      padding: var(--space-xs);
+    }
+  }
+</style>

@@ -1,0 +1,60 @@
+---
+interface Props {
+  completedUnits: number;
+  totalUnits: number;
+  label?: string;
+}
+
+const { completedUnits, totalUnits, label = "挑战进度" } = Astro.props;
+const percent = Math.round((completedUnits / totalUnits) * 100);
+const degrees = Math.round((completedUnits / totalUnits) * 360);
+---
+
+<div
+  class="progress-ring"
+  style={`--ring-degrees: ${degrees}deg`}
+  aria-label={`${label}：完成了 ${percent}% 的挑战`}
+>
+  <div class="ring-value" aria-hidden="true">{percent}%</div>
+  <p>完成了 {percent}% 的挑战</p>
+</div>
+
+<style>
+  .progress-ring {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-xs);
+    min-width: 76px;
+  }
+
+  .progress-ring::before {
+    display: block;
+    width: 58px;
+    height: 58px;
+    border-radius: var(--radius-full);
+    background:
+      radial-gradient(circle, var(--color-surface) 58%, transparent 60%),
+      conic-gradient(var(--color-primary) var(--ring-degrees), rgba(74, 144, 226, 0.14) 0);
+    content: "";
+  }
+
+  .ring-value {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    margin-top: calc(-58px - var(--space-xs));
+    place-items: center;
+    color: var(--color-primary);
+    font-size: var(--font-size-caption);
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .progress-ring p {
+    max-width: 86px;
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    line-height: 1.35;
+    text-align: center;
+  }
+</style>

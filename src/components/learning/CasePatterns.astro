@@ -1,0 +1,61 @@
+---
+interface CasePattern {
+  label: string;
+  when: string;
+  action: string;
+  result: string;
+}
+
+interface Props {
+  patterns?: CasePattern[];
+}
+
+const { patterns = [] } = Astro.props;
+---
+
+{patterns.length > 0 && (
+  <section class="case-patterns" aria-labelledby="case-patterns-title">
+    <h2 id="case-patterns-title">分型判断</h2>
+    <div class="pattern-list">
+      {
+        patterns.map((pattern) => (
+          <article class="pattern-card">
+            <strong>{pattern.label}</strong>
+            <p><span>看到</span>{pattern.when}</p>
+            <p><span>操作</span>{pattern.action}</p>
+            <p><span>结果</span>{pattern.result}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+)}
+
+<style>
+  .case-patterns,
+  .pattern-list,
+  .pattern-card {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .pattern-card {
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .pattern-card p {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: var(--space-sm);
+    margin: 0;
+    color: var(--color-muted-text);
+  }
+
+  .pattern-card span {
+    color: var(--color-text);
+    font-weight: 700;
+  }
+</style>

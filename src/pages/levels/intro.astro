@@ -1,0 +1,101 @@
+---
+import PageShell from "../../components/layout/PageShell.astro";
+import Badge from "../../components/ui/Badge.astro";
+import Button from "../../components/ui/Button.astro";
+import Card from "../../components/ui/Card.astro";
+import { routeSeo } from "../../data/seo";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { sitePath } from "../../utils/paths";
+---
+
+<BaseLayout {...routeSeo["/levels/intro"]} analyticsEvent="level_intro_view" analyticsProps={{ path: "/levels/intro" }}>
+  <PageShell tone="quiet">
+    <section class="intro-hero" aria-labelledby="intro-title">
+      <Badge tone="green">入门介绍</Badge>
+      <h1 id="intro-title">先看懂魔方，再开始第一关</h1>
+      <p>魔方不是靠聪明硬扛，而是把大目标拆成小关卡。先认识面、块和工作台面，再练“上勾下回”：用固定手法保护已归位的方块，在每一批复原基础上继续前进。</p>
+    </section>
+
+    <Card as="section">
+      <Badge tone="blue">视频出处</Badge>
+      <p>教程源出处：B 站 up 主「魔方达人夏天」。建议配合原视频使用；如果图示说明仍有疑惑，可以打开视频看对应动作。喜欢这个教程，也可以给原作者投两个硬币表达尊重。</p>
+      <p><strong>视频位置：</strong>第一章：基本手法（00:00 - 00:34）</p>
+      <a class="source-link" href="https://b23.tv/3VqPCa9">【2026版】三阶入门保姆级教程！学不会算我输！</a>
+    </Card>
+
+    <section class="intro-images" aria-label="入门 PNG 图示">
+      <figure>
+        <img src={sitePath("/images/intro/intro-02-cube-basics.png")} alt="认识魔方的面、中心块、棱块和角块" />
+        <figcaption>认识魔方</figcaption>
+      </figure>
+      <figure>
+        <img src={sitePath("/images/intro/intro-03-formula-intro.png")} alt="上勾下回的基本原理和动作说明" />
+        <figcaption>上勾下回</figcaption>
+      </figure>
+    </section>
+
+    <section class="intro-next" aria-label="开始第一关">
+      <Button href="/levels/fake-cross">进入第一关</Button>
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .intro-hero {
+    display: grid;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .intro-hero p {
+    max-width: 68ch;
+  }
+
+  .intro-images {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .intro-next {
+    display: flex;
+    justify-content: center;
+  }
+
+  .source-link {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .intro-images figure {
+    display: grid;
+    gap: var(--space-sm);
+    margin: 0;
+  }
+
+  .intro-images img {
+    display: block;
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .intro-images figcaption {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+  }
+
+  @media (min-width: 720px) {
+    .intro-hero {
+      padding: var(--space-2xl);
+    }
+
+    .intro-next {
+      justify-content: flex-start;
+    }
+  }
+</style>

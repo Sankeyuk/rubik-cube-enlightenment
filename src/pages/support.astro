@@ -1,0 +1,81 @@
+---
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Callout from "../components/ui/Callout.astro";
+import Card from "../components/ui/Card.astro";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout {...routeSeo["/support"]} analyticsEvent="support_view" analyticsProps={{ path: "/support" }}>
+  <PageShell>
+    <section class="page-intro" aria-labelledby="support-title">
+      <Badge tone="green">支持占位</Badge>
+      <h1 id="support-title">支持入口先保留，等主要页面稳定后再设计</h1>
+      <p>这个页面现在只说明方向：如果这个项目继续推进，支持会帮助把复杂学习变成孩子能进入的故事、图示和练习材料。</p>
+    </section>
+
+    <section class="support-grid" aria-label="支持可能帮助什么">
+      <Card>
+        <h2>继续完善故事</h2>
+        <p>让动物绘本角色、世界观和故事样章更稳定，再进入真实美术生产。</p>
+      </Card>
+      <Card>
+        <h2>继续补齐图示</h2>
+        <p>把关卡的起始状态、关键步骤和完成结果整理成清楚的 PNG 示意图。</p>
+      </Card>
+      <Card>
+        <h2>继续验证材料</h2>
+        <p>判断打印卡、绘本包和学习材料包是否真的能帮助家长和孩子。</p>
+      </Card>
+    </section>
+
+    <Callout tone="warning">
+      <strong>当前边界</strong>
+      <p>本阶段不接支付、不接赞助表单、不承诺正式赞助方式。这里先作为未来收入产品线的页面入口。</p>
+    </Callout>
+
+    <section class="connect" aria-labelledby="next-title">
+      <h2 id="next-title">先看当前已经能用的内容</h2>
+      <p>绘本引入页和教程关卡是第一阶段的主要内容。</p>
+      <div class="actions">
+        <Button href="/story">魔方故事</Button>
+        <Button href="/levels" variant="secondary">教程关卡</Button>
+      </div>
+    </section>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .page-intro,
+  .connect {
+    display: grid;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .support-grid,
+  .actions {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 720px) {
+    .page-intro,
+    .connect {
+      padding: var(--space-2xl);
+    }
+
+    .support-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .actions {
+      grid-template-columns: max-content max-content;
+    }
+  }
+</style>

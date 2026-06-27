@@ -1,0 +1,83 @@
+---
+import type { AnimalProfile } from "../../data/animalSkin";
+import Button from "../ui/Button.astro";
+import { sitePath } from "../../utils/paths";
+
+interface Props {
+  animal: AnimalProfile;
+  hint: string;
+  levelSlug: string;
+}
+
+const { animal, hint, levelSlug } = Astro.props;
+---
+
+<aside class="animal-hint" aria-label={`${animal.name} 的学习提示`}>
+  <img class="animal-sticker" src={sitePath(animal.sticker)} alt={animal.alt} loading="lazy" />
+  <div class="hint-copy">
+    <p class="hint-kicker">{animal.name} · {animal.role}</p>
+    <h2>方块村小提示</h2>
+    <p>{hint}</p>
+    <div class="hint-actions">
+      <Button href="/picturebook" variant="secondary" analyticsEvent="picturebook_click" analyticsProps={{ source_path: `/levels/${levelSlug}`, source_label: "animal_hint" }}>
+        看方块村绘本
+      </Button>
+    </div>
+  </div>
+</aside>
+
+<style>
+  .animal-hint {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: var(--space-md);
+    align-items: center;
+    padding: var(--space-md);
+    border: 1px solid rgba(219, 151, 46, 0.28);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(135deg, rgba(255, 247, 224, 0.84), rgba(255, 255, 255, 0.92)),
+      var(--color-surface);
+  }
+
+  .animal-sticker {
+    display: block;
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+  }
+
+  .hint-copy {
+    display: grid;
+    gap: var(--space-sm);
+    min-width: 0;
+  }
+
+  .hint-kicker {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-small);
+    font-weight: 800;
+  }
+
+  .hint-copy h2 {
+    font-size: var(--font-size-h3);
+  }
+
+  .hint-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  @media (max-width: 520px) {
+    .animal-hint {
+      grid-template-columns: 64px minmax(0, 1fr);
+      padding: var(--space-md);
+    }
+
+    .animal-sticker {
+      width: 64px;
+      height: 64px;
+    }
+  }
+</style>

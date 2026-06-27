@@ -1,0 +1,68 @@
+---
+---
+
+<div class="seat-grid" aria-label="方格人找座位示意">
+  <span class="seat filled blue">1</span>
+  <span class="seat empty">2</span>
+  <span class="seat filled yellow">3</span>
+  <span class="seat filled red">4</span>
+  <span class="seat target">座</span>
+  <span class="seat filled green">6</span>
+  <span class="seat empty">7</span>
+  <span class="seat lost">?</span>
+  <span class="seat empty">9</span>
+</div>
+
+<style>
+  .seat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+    max-width: 260px;
+  }
+
+  .seat {
+    display: grid;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-muted);
+    color: var(--color-muted-text);
+    font-size: var(--font-size-caption);
+  }
+
+  .filled.blue {
+    background: rgba(74, 144, 226, 0.15);
+    color: var(--color-primary);
+  }
+
+  .filled.yellow {
+    background: rgba(245, 200, 76, 0.22);
+    color: #7a5b00;
+  }
+
+  .filled.red {
+    background: rgba(232, 93, 93, 0.14);
+    color: var(--color-error);
+  }
+
+  .filled.green {
+    background: rgba(98, 184, 121, 0.16);
+    color: #2f7041;
+  }
+
+  .target {
+    border-color: var(--color-accent-green);
+    background: rgba(98, 184, 121, 0.12);
+    color: #2f7041;
+    font-weight: 700;
+  }
+
+  .lost {
+    border-color: var(--color-primary);
+    background: var(--color-surface);
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+</style>

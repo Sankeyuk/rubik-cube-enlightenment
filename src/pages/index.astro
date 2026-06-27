@@ -1,0 +1,232 @@
+---
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import { picturebookPages, villageAnimals } from "../data/animalSkin";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { sitePath } from "../utils/paths";
+
+const picturebookCover = picturebookPages[0];
+---
+
+<BaseLayout {...routeSeo["/"]} analyticsEvent="home_view" analyticsProps={{ path: "/" }}>
+  <PageShell>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <h1 id="hero-title">玩转魔方，有手就行。</h1>
+        <p>8 个关卡一步一步走，方块村的动物只负责陪孩子进入，不打断教程主线。</p>
+        <div class="hero-actions">
+          <Button href="/levels" analyticsEvent="levels_click" analyticsProps={{ source_path: "/", source_label: "home_hero" }}>开始学习路径</Button>
+          <Button href="/picturebook" variant="secondary" analyticsEvent="picturebook_click" analyticsProps={{ source_path: "/", source_label: "home_hero" }}>先看方块村绘本</Button>
+        </div>
+      </div>
+      <section class="intro-principle" aria-labelledby="intro-principle-title">
+        <Badge tone="green">项目意义</Badge>
+        <h2 id="intro-principle-title">从一个小魔方开始，重新练习“我能”</h2>
+        <p>魔方很小，但它会真实地暴露注意力、方向感、手部动作和挫败感。一次直接复原太难，就把它拆成 8 个关卡；每一关只解决一个看得见的问题。</p>
+        <p>孩子不需要一开始就理解全部规则。先看图，先完成一张任务卡，先获得一次具体的正反馈。</p>
+      </section>
+    </section>
+
+    <section class="village-entry" aria-labelledby="village-title">
+      <div class="section-heading">
+        <Badge tone="yellow">方块村</Badge>
+        <h2 id="village-title">先认识 6 个颜色家的小居民</h2>
+        <p>孩子可以先看绘本，再回到 8 关地图；每一关仍然只解决一个清楚的魔方目标。</p>
+      </div>
+      <div class="village-layout">
+        <a class="picturebook-card" href="/picturebook" aria-label="打开方块村魔方绘本">
+          <img src={sitePath(picturebookCover.src)} alt={picturebookCover.alt} loading="lazy" />
+          <span>魔方绘本</span>
+          <strong>方块村被转乱的一天</strong>
+        </a>
+        <div class="animal-roster" aria-label="方块村居民">
+          {
+            villageAnimals.map((animal) => (
+              <div class="animal-chip">
+                <img src={sitePath(animal.avatar)} alt={animal.alt} loading="lazy" />
+                <div>
+                  <strong>{animal.name}</strong>
+                  <span>{animal.home}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="meaning-grid" aria-labelledby="meaning-heading">
+      <div class="section-heading">
+        <Badge tone="green">为什么做</Badge>
+        <h2 id="meaning-heading">把困难铺成孩子能走上去的踏板</h2>
+      </div>
+      <div class="cards-grid">
+        <Card>
+          <h3>不是一次复原，是一次一关</h3>
+          <p>完整复原魔方对孩子来说链条太长。这个网站把大目标拆成清楚的关卡，每一关只看一个目标、做一个动作、确认一个结果。</p>
+        </Card>
+        <Card>
+          <h3>用非屏幕玩具训练注意力</h3>
+          <p>魔方适合在车上、排队、吃饭等待时拿出来练。它像一个小哑铃，训练观察、方向判断和持续控制自己的手。</p>
+        </Card>
+        <Card>
+          <h3>让家长也能参与身教</h3>
+          <p>遇到难题时，家长的回应本身就是示范。我们不绕开困难，而是把困难画清楚、拆小、陪孩子一起完成。</p>
+        </Card>
+        <Card>
+          <h3>最终要留下“我能”的感觉</h3>
+          <p>当孩子亲手把一个混乱的魔方复原成整齐的六面，得到的不只是结果，还有一种真实的成就感。</p>
+        </Card>
+      </div>
+    </section>
+
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  .hero-copy,
+  .section-heading,
+  .meaning-grid,
+  .village-entry {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .hero-copy p,
+  .section-heading p {
+    max-width: 62ch;
+  }
+
+  .hero-actions,
+  .village-layout,
+  .animal-roster {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .intro-principle {
+    display: grid;
+    gap: var(--space-md);
+    align-content: start;
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-muted);
+  }
+
+  .intro-principle p {
+    margin: 0;
+  }
+
+  .cards-grid,
+  .card-actions {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .village-entry {
+    padding: var(--space-xl);
+    border: 1px solid rgba(219, 151, 46, 0.24);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(135deg, rgba(255, 247, 224, 0.78), rgba(255, 255, 255, 0.92)),
+      var(--color-surface);
+  }
+
+  .picturebook-card {
+    display: grid;
+    gap: var(--space-sm);
+    min-width: 0;
+    padding: var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .picturebook-card img {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: #f7ead2;
+  }
+
+  .picturebook-card span {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-small);
+    font-weight: 800;
+  }
+
+  .animal-roster {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .animal-chip {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: var(--space-sm);
+    align-items: center;
+    min-width: 0;
+    padding: var(--space-sm);
+    border: 1px solid rgba(39, 39, 42, 0.08);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .animal-chip img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+  }
+
+  .animal-chip div {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .animal-chip span {
+    color: var(--color-muted-text);
+    font-size: var(--font-size-small);
+  }
+
+  @media (min-width: 720px) {
+    .hero,
+    .meaning-grid,
+    .village-entry {
+      padding: var(--space-2xl);
+    }
+
+    .hero-actions {
+      grid-template-columns: max-content max-content;
+    }
+
+    .village-layout {
+      grid-template-columns: minmax(240px, 0.42fr) minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .cards-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .animal-roster {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

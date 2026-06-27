@@ -1,0 +1,132 @@
+---
+import PageShell from "../components/layout/PageShell.astro";
+import Badge from "../components/ui/Badge.astro";
+import Button from "../components/ui/Button.astro";
+import Callout from "../components/ui/Callout.astro";
+import Card from "../components/ui/Card.astro";
+import { routeSeo } from "../data/seo";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const projectPaths = [
+  {
+    line: "网站容器",
+    path: "rubik-cube-enlightenment / website",
+  },
+  {
+    line: "内容故事线",
+    path: "rubik-content-line",
+  },
+  {
+    line: "示意图编辑器",
+    path: "cube-color-editor",
+  },
+  {
+    line: "项目统领",
+    path: "rubik-project-governance",
+  },
+];
+---
+
+<BaseLayout {...routeSeo["/interfaces"]}>
+  <PageShell>
+    <section class="page-intro" aria-labelledby="interfaces-title">
+      <Badge tone="green">接口合拢</Badge>
+      <h1 id="interfaces-title">网站负责展示和聚合，不把所有工具塞进工程</h1>
+      <p>这一页记录魔方网站如何接入内容线、示意图编辑器、收入产品线和项目统领文档，给后续人类协作和 AI 协作一个固定入口。</p>
+      <div class="actions">
+        <Button href="/story">故事入口</Button>
+        <Button href="/diagrams" variant="secondary">示意图入口</Button>
+      </div>
+    </section>
+
+    <section class="interface-grid" aria-labelledby="flow-title">
+      <div class="section-heading">
+        <Badge tone="blue">材料流向</Badge>
+        <h2 id="flow-title">每条线只承担自己的职责</h2>
+      </div>
+      <div class="cards-grid">
+        <Card>
+          <h3>内容故事线</h3>
+          <p>产生故事文本、角色设定、分镜需求和图片尺寸，进入 `/story` 与 `/story/[slug]`。</p>
+        </Card>
+        <Card>
+          <h3>示意图编辑器线</h3>
+          <p>辅助人工导出清晰 PNG，放入关卡图位；第一阶段不做工程化合拢。</p>
+        </Card>
+        <Card>
+          <h3>收入产品线</h3>
+          <p>第一阶段只保留 `/materials` 和 `/support` 占位，主要页面完成后再设计。</p>
+        </Card>
+        <Card>
+          <h3>统领线</h3>
+          <p>管理业务线边界、项目路径、版本节奏，并把规则反映到网站页面和 AGENTS。</p>
+        </Card>
+      </div>
+    </section>
+
+    <section class="paths" aria-labelledby="paths-title">
+      <div class="section-heading">
+        <Badge tone="yellow">项目路径</Badge>
+        <h2 id="paths-title">当前对接入口</h2>
+      </div>
+      <div class="path-list">
+        {
+          projectPaths.map((item) => (
+            <Card>
+              <h3>{item.line}</h3>
+              <code>{item.path}</code>
+            </Card>
+          ))
+        }
+      </div>
+    </section>
+
+    <Callout tone="info">
+      <strong>更新规则</strong>
+      <p>页面结构变化更新网站 PRD；内容槽变化更新网站 CONTENT；故事角色和物料规格变化更新内容线；编辑器能力变化先更新编辑器项目。</p>
+    </Callout>
+  </PageShell>
+</BaseLayout>
+
+<style>
+  .page-intro,
+  .interface-grid,
+  .paths,
+  .section-heading,
+  .cards-grid,
+  .path-list,
+  .actions {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  .page-intro {
+    padding: var(--space-xl);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+  }
+
+  code {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: var(--color-muted-text);
+    font-size: 0.88rem;
+  }
+
+  @media (min-width: 720px) {
+    .page-intro {
+      padding: var(--space-2xl);
+    }
+
+    .actions {
+      grid-template-columns: max-content max-content;
+    }
+
+    .cards-grid,
+    .path-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
