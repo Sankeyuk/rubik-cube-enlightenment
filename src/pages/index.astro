@@ -9,18 +9,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { sitePath } from "../utils/paths";
 
 const picturebookCover = picturebookPages[0];
+const heroCover = "/images/picturebook-skin/picturebook/block-village-v1/picturebook-block-village-wechat-cover.png";
 ---
 
 <BaseLayout {...routeSeo["/"]} analyticsEvent="home_view" analyticsProps={{ path: "/" }}>
   <PageShell>
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <h1 id="hero-title">玩转魔方，有手就行。</h1>
-        <p>8 个关卡一步一步走，方块村的动物只负责陪孩子进入，不打断教程主线。</p>
-        <div class="hero-actions">
-          <Button href="/levels" analyticsEvent="levels_click" analyticsProps={{ source_path: "/", source_label: "home_hero" }}>开始学习路径</Button>
-          <Button href="/picturebook" variant="secondary" analyticsEvent="picturebook_click" analyticsProps={{ source_path: "/", source_label: "home_hero" }}>先看方块村绘本</Button>
+      <div class="hero-content">
+        <div class="hero-copy">
+          <Badge tone="yellow">方块村魔方启蒙</Badge>
+          <h1 id="hero-title">
+            玩转魔方，<br class="mobile-title-break" />有手就行。
+          </h1>
+          <p>8 个关卡一步一步走，方块村的动物只负责陪孩子进入，不打断教程主线。</p>
+          <div class="hero-actions">
+            <Button href="/levels" analyticsEvent="levels_click" analyticsProps={{ source_path: "/", source_label: "home_hero" }}>开始学习路径</Button>
+            <Button href="/picturebook" variant="secondary" analyticsEvent="picturebook_click" analyticsProps={{ source_path: "/", source_label: "home_hero" }}>先看方块村绘本</Button>
+          </div>
         </div>
+        <img class="hero-cover" src={sitePath(heroCover)} alt="方块村动物围着魔方的横向绘本封面" loading="eager" />
       </div>
       <section class="intro-principle" aria-labelledby="intro-principle-title">
         <Badge tone="green">项目意义</Badge>
@@ -37,7 +44,7 @@ const picturebookCover = picturebookPages[0];
         <p>孩子可以先看绘本，再回到 8 关地图；每一关仍然只解决一个清楚的魔方目标。</p>
       </div>
       <div class="village-layout">
-        <a class="picturebook-card" href="/picturebook" aria-label="打开方块村魔方绘本">
+        <a class="picturebook-card" href={sitePath("/picturebook")} aria-label="打开方块村魔方绘本">
           <img src={sitePath(picturebookCover.src)} alt={picturebookCover.alt} loading="lazy" />
           <span>魔方绘本</span>
           <strong>方块村被转乱的一天</strong>
@@ -89,13 +96,17 @@ const picturebookCover = picturebookPages[0];
 <style>
   .hero {
     display: grid;
-    gap: var(--space-lg);
+    gap: var(--space-md);
     padding: var(--space-xl);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background: var(--color-surface);
+    background:
+      linear-gradient(135deg, rgba(255, 247, 224, 0.72), rgba(255, 255, 255, 0.96) 54%),
+      var(--color-surface);
+    overflow: hidden;
   }
 
+  .hero-content,
   .hero-copy,
   .section-heading,
   .meaning-grid,
@@ -109,6 +120,14 @@ const picturebookCover = picturebookPages[0];
     max-width: 62ch;
   }
 
+  .hero-copy h1 {
+    max-width: 10em;
+  }
+
+  .mobile-title-break {
+    display: block;
+  }
+
   .hero-actions,
   .village-layout,
   .animal-roster {
@@ -116,18 +135,33 @@ const picturebookCover = picturebookPages[0];
     gap: var(--space-md);
   }
 
+  .hero-cover {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    object-position: center;
+    border: 1px solid rgba(39, 39, 42, 0.08);
+    border-radius: var(--radius-md);
+    background: #f7ead2;
+  }
+
   .intro-principle {
     display: grid;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     align-content: start;
-    padding: var(--space-lg);
-    border: 1px solid var(--color-border);
+    padding: var(--space-md);
+    border: 1px solid rgba(39, 39, 42, 0.08);
     border-radius: var(--radius-md);
-    background: var(--color-surface-muted);
+    background: rgba(255, 255, 255, 0.72);
   }
 
   .intro-principle p {
     margin: 0;
+  }
+
+  .intro-principle h2 {
+    max-width: 12em;
   }
 
   .cards-grid,
@@ -212,8 +246,26 @@ const picturebookCover = picturebookPages[0];
       padding: var(--space-2xl);
     }
 
+    .hero {
+      gap: var(--space-lg);
+    }
+
+    .hero-content {
+      grid-template-columns: minmax(0, 0.95fr) minmax(280px, 1.05fr);
+      align-items: center;
+      gap: var(--space-xl);
+    }
+
     .hero-actions {
       grid-template-columns: max-content max-content;
+    }
+
+    .mobile-title-break {
+      display: none;
+    }
+
+    .hero-cover {
+      max-height: 420px;
     }
 
     .village-layout {
